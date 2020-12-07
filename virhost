@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#This script automates the process of creating a virtual host on an apache development server.
+
+if [ -d /etc/apache2/sites-available ]; then
+ cd /etc/apache2/sites-available
+else
+ echo "The directory /etc/apache2/sites-available does not exist." >&2
+ exit 1
+fi
+
+if [ -z "$1" ]; then
+ echo "You didn't enter a name." >&2
+ exit 1
+elif [ -f "$1.conf" ]; then
+ echo "A virtual host file by this name already exists." >&2
+ ls
+ exit 1
+else
+ sudo cp 000-default.conf "$1.conf"
+ sudo sed -i '11,12c \\tServerAdmin '"webmaster@$1.com"'\n\tDocumentRoot \/var\/www\/'"$1"'\n\tServerName '"$1.com"'' "$1.conf"
+ sudo a2ensite "$1.conf" > /dev/null
+ if pgrep -x "apache2" > /dev/null; then
+  sudo systemctl reload apache2
+  echo "The new configuration has been activated."
+ else
+  sudo systemctl start apache2
+  echo "The new configuration has been activated, and apache is now running."
+ fi 
+fi
