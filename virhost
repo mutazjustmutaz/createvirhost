@@ -3,7 +3,7 @@
 #This script automates the process of creating a virtual host on an apache development server.
 
 if [ -d /etc/apache2/sites-available ]; then
- cd /etc/apache2/sites-available
+ cd /etc/apache2/sites-available || exit
 else
  echo "The directory /etc/apache2/sites-available does not exist." >&2
  exit 1
